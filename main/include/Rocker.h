@@ -7,8 +7,6 @@
 #include "freertos/task.h"
 #include "freertos/timers.h"
 
-#define ROCKER_NUMBER 3
-
 class Rocker {
 public:
     Rocker();

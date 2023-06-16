@@ -9,10 +9,18 @@
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_check.h"
 #include "esp_chip_info.h"
+#include "freertos/queue.h"
 #include "esp_flash.h"
+#include "Rocker.h"
 
-void app_main(void)
+static const char * TAG = "hello_world_main.cpp";
+
+#define ROCKER_GPIO_NUM ((gpio_num_t) 27) // Left button on M5Stack
+Rocker gRocker;
+
+extern "C" void app_main(void)
 {
     printf("Hello world!\n");
 
@@ -39,11 +47,20 @@ void app_main(void)
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
 
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    esp_err_t err;
+    // Initialize the buttons.
+    err = gpio_install_isr_service(ESP_INTR_FLAG_EDGE);
+    if(err != ESP_OK) {
+        ESP_LOGE(TAG, "Rocker isr_install failed: %s", esp_err_to_name(err));
     }
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
+
+    printf("Initialize Rocker on pin %u\n", (int)ROCKER_GPIO_NUM);
+    gRocker = Rocker(ROCKER_GPIO_NUM);
+    gRocker.Init();
+
+    int cnt = 0;
+    while(1) {
+        printf("cnt: %d\n", cnt++);
+        vTaskDelay(30000 / portTICK_PERIOD_MS);
+    }
 }

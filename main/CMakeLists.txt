@@ -1,3 +1,3 @@
-idf_component_register(SRCS "hello_world_main.c" "Rocker.cpp"
+idf_component_register(SRCS "hello_world_main.cpp" "Rocker.cpp"
                     INCLUDE_DIRS "./include")
 
