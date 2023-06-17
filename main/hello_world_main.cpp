@@ -14,11 +14,16 @@
 #include "freertos/queue.h"
 #include "esp_flash.h"
 #include "Rocker.h"
+#include "Pin.h"
 
-static const char * TAG = "hello_world_main.cpp";
+static const char * MAIN_TAG = "hello_world_main.cpp";
 
-#define ROCKER_GPIO_NUM ((gpio_num_t) 27) // Left button on M5Stack
+#define ROCKER_GPIO_NUM ((gpio_num_t) 27)
+#define RELAY_GPIO_NUM ((gpio_num_t) 26)
+
+
 Rocker gRocker;
+Pin gPinRelay;
 
 extern "C" void app_main(void)
 {
@@ -51,12 +56,15 @@ extern "C" void app_main(void)
     // Initialize the buttons.
     err = gpio_install_isr_service(ESP_INTR_FLAG_EDGE);
     if(err != ESP_OK) {
-        ESP_LOGE(TAG, "Rocker isr_install failed: %s", esp_err_to_name(err));
+        ESP_LOGE(MAIN_TAG, "Rocker isr_install failed: %s", esp_err_to_name(err));
     }
 
     printf("Initialize Rocker on pin %u\n", (int)ROCKER_GPIO_NUM);
     gRocker = Rocker(ROCKER_GPIO_NUM);
     gRocker.Init();
+    gPinRelay = Pin(RELAY_GPIO_NUM);
+    gPinRelay.Init();
+
 
     int cnt = 0;
     while(1) {

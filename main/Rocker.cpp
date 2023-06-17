@@ -6,10 +6,12 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "Rocker.h"
+#include "Pin.h"
 
-static const char * TAG = "Rocker.cpp";
+static const char * ROCKER_TAG = "Rocker.cpp";
 
 extern Rocker gRocker;
+extern Pin gPinRelay;
 
 Rocker::Rocker() {}
 
@@ -66,7 +68,7 @@ esp_err_t Rocker::Init(gpio_num_t gpioNum)
     gpio_set_level(gpioNum, 1);
     // hook isr handler for specific gpio pin
     ret = gpio_isr_handler_add(gpioNum, rocker_isr_handler, (void *) gpioNum);
-    ESP_RETURN_ON_ERROR(ret, TAG, "gpio_isr_handler_add failed: %s", esp_err_to_name(ret));
+    ESP_RETURN_ON_ERROR(ret, ROCKER_TAG, "gpio_isr_handler_add failed: %s", esp_err_to_name(ret));
 
     mrockerTimer = xTimerCreate("BtnTmr",               // Just a text name, not used by the RTOS kernel
                                 pdMS_TO_TICKS(50),      // timer period
@@ -84,5 +86,6 @@ void Rocker::TimerCallback(TimerHandle_t xTimer)
     // Get the button index of the expired timer and call button event Handler.
     uint32_t gpio_num = (uint32_t) pvTimerGetTimerID(xTimer);
     //GetAppTask().ButtonEventHandler(gpio_num, APP_BUTTON_PRESSED);
-    ESP_LOGI(TAG, "TimerCallback %lu", gpio_num);
+    ESP_LOGI(ROCKER_TAG, "TimerCallback %lu", gpio_num);
+    gPinRelay.Toggle();
 }
