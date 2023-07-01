@@ -15,15 +15,19 @@
 #include "esp_flash.h"
 #include "Rocker.h"
 #include "Pin.h"
+#include "ContactSensor.h"
 
 static const char * MAIN_TAG = "hello_world_main.cpp";
 
 #define ROCKER_GPIO_NUM ((gpio_num_t) 27)
 #define RELAY_GPIO_NUM ((gpio_num_t) 26)
+#define CS_GPIO_NUM ((gpio_num_t) 32)
 
 
 Rocker gRocker;
 Pin gPinRelay;
+ContactSensor gContactSensor;
+
 
 extern "C" void app_main(void)
 {
@@ -64,7 +68,8 @@ extern "C" void app_main(void)
     gRocker.Init();
     gPinRelay = Pin(RELAY_GPIO_NUM);
     gPinRelay.Init();
-
+    gContactSensor = ContactSensor(CS_GPIO_NUM);
+    gContactSensor.Init();
 
     int cnt = 0;
     while(1) {
